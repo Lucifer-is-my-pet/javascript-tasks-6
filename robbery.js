@@ -187,7 +187,6 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
         bankSchedule[i].to = [anyDate.getHours(), anyDate.getMinutes(), i];
     }
     var freeTime = invertIntervals(fillSchedule(JSON.parse(json)));
-    var soughtMoment = new Date();
     for (var i in bankSchedule) {
         var thatDayIntervals = {bank: [bankSchedule[i]]};
 
@@ -245,13 +244,13 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
             //console.log('begin', theBeginning);
             //console.log('end', theEnd);
             if (durationBetween(theBeginning, theEnd) >= 90) {
-
                 appropriateMoment.date = theBeginning;
+                return appropriateMoment;
             }
         }
+        //console.log('-------');
     }
-
-    return appropriateMoment;
+    return null;
 };
 
 // Возвращает статус ограбления (этот метод уже готов!)

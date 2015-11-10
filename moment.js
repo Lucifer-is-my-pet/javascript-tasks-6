@@ -25,6 +25,9 @@ module.exports = function () {
             var day = week[theDate.getDay()];
             var hours = theDate.getHours();
             var minutes = theDate.getMinutes();
+            if (minutes === 0) {
+                minutes = '00';
+            }
             var dictOfFormats = {
                 '%DD': day,
                 '%HH': hours,
