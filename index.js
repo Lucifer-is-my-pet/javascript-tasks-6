@@ -30,7 +30,7 @@ var robberyMoment = robbery.getAppropriateMoment(
 // - %HH - часы
 // - %MM - минуты
 console.log(
-    robberyMoment.format('Ограбление должно состоятся в %DD. Всем быть готовыми к %HH:%MM!')
+    robberyMoment.format('Ограбление должно состояться в %DD. Всем быть готовыми к %HH:%MM!')
 );
 // Ограбление должно состоятся в ВТ. Всем быть готовыми к 03:30!
 
@@ -42,20 +42,20 @@ console.log(
 robberyMoment.timezone = 5; // Переводим время в часовой пояс Котеринбурга
 
 
-// Необязательное задание (+40 к смекалке)
-
-var currentMoment = moment();
-
-// Как во всех фильмах про ограбления мы будем писать:
-
-currentMoment.date = 'ПН 09:01+5';
-console.log(
-    robbery.getStatus(currentMoment, robberyMoment)
-);
-// «До ограбления остался 1 день 6 часов 59 минут»
-
-currentMoment.date = 'ПН 12:59+5';
-console.log(
-    robbery.getStatus(currentMoment, robberyMoment)
-);
-// «До ограбления остался 21 час 1 минута»
+//// Необязательное задание (+40 к смекалке)
+//
+//var currentMoment = moment();
+//
+//// Как во всех фильмах про ограбления мы будем писать:
+//
+//currentMoment.date = 'ПН 09:01+5';
+//console.log(
+//    robbery.getStatus(currentMoment, robberyMoment)
+//);
+//// «До ограбления остался 1 день 6 часов 59 минут»
+//
+//currentMoment.date = 'ПН 12:59+5';
+//console.log(
+//    robbery.getStatus(currentMoment, robberyMoment)
+//);
+//// «До ограбления остался 21 час 1 минута»
