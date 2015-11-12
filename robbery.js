@@ -97,20 +97,7 @@ function invertIntervals(schedule) {
 }
 
 function areEqual(firstObject, secondObject) {
-    var firstKeys = Object.keys(firstObject);
-    var secondKeys = Object.keys(secondObject);
-    if (firstKeys.length !== secondKeys.length) {
-        return false;
-    }
-    if (firstKeys.toString() !== secondKeys.toString()) {
-        return false;
-    }
-    for (var i in firstObject) {
-        if (firstObject[i].toString() !== secondObject[i].toString()) {
-            return false;
-        }
-    }
-    return true;
+    return JSON.stringify(firstObject) === JSON.stringify(secondObject);
 }
 
 function indexOfObject(arrayOfArrays, array) {
@@ -243,7 +230,7 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
             }
             //console.log('begin', theBeginning);
             //console.log('end', theEnd);
-            if (durationBetween(theBeginning, theEnd) >= 90) {
+            if (durationBetween(theBeginning, theEnd) >= minDuration) {
                 appropriateMoment.date = theBeginning;
                 return appropriateMoment;
             }
