@@ -2,26 +2,33 @@
 
 var moment = require('./moment');
 
-function sliceAndParse(string, index) {
+function cutTheTime(string, index) {
     return parseInt(string.slice(index, index + 2));
 }
 
-function convertToUTC(schedule, offset) {
+function convertToUTC(schedule, offset, withDayOfTheWeek) {
     var result = {
         from: [],
         to: []
     };
-    var hoursFrom = schedule['from'].slice(0, 2);
-    var hoursTo = schedule['to'].slice(0, 2);
-    var anyDate = new Date;
-    anyDate.setHours(hoursFrom - offset);
-    var newHoursFrom = anyDate.getHours();
-    anyDate.setHours(hoursTo - offset);
-    var newHoursTo = anyDate.getHours();
-    result['from'].push(newHoursFrom);
-    result['from'].push(sliceAndParse(schedule['from'], 3));
-    result['to'].push(newHoursTo);
-    result['to'].push(sliceAndParse(schedule['to'], 3));
+    var index = 0;
+    if (withDayOfTheWeek) {
+        index += 3;
+    }
+    var hoursFrom = schedule['from'].slice(index, 2 + index);
+    var hoursTo = schedule['to'].slice(index, 2 + index);
+    var newFrom = new Date(2015, 0, 1, hoursFrom - offset, cutTheTime(schedule['from'], 3 + index));
+    var newTo = new Date(2015, 0, 1, hoursTo - offset, cutTheTime(schedule['to'], 3 + index));
+    result.from.push(newFrom.getHours(), newFrom.getMinutes());
+    result.to.push(newTo.getHours(), newTo.getMinutes());
+
+    if (withDayOfTheWeek) {
+        var week = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+        var dayFrom = week.indexOf(schedule['from'].slice(0, 2));
+        result.from.push(dayFrom);
+        var dayTo = week.indexOf(schedule['to'].slice(0, 2));
+        result.to.push(dayTo);
+    }
     return result;
 }
 
@@ -41,19 +48,10 @@ function fillSchedule(schedule) {
     for (var i in schedule) {
         result[i] = [];
     }
-    var week = ['ВС', 'ПН', 'ВТ', 'СР'];
     for (var i in schedule) {
+        var offset = cutTheTime(schedule[i][0]['from'], 8);
         for (var j in schedule[i]) {
-            result[i].push({ // часы - сдвиг, минуты, день недели
-                from: [sliceAndParse(schedule[i][j]['from'], 3) -
-                sliceAndParse(schedule[i][j]['from'], 8),
-                    sliceAndParse(schedule[i][j]['from'], 6),
-                    week.indexOf(schedule[i][j]['from'].slice(0, 2))],
-                to: [sliceAndParse(schedule[i][j]['to'], 3) -
-                sliceAndParse(schedule[i][j]['to'], 8),
-                    sliceAndParse(schedule[i][j]['to'], 6),
-                    week.indexOf(schedule[i][j]['to'].slice(0, 2))]
-            });
+            result[i].push(convertToUTC(schedule[i][j], offset, true));
         }
     }
     return result;
@@ -150,6 +148,9 @@ function findAllCombinations(listOfIntervals) { // задача: вернуть 
 
 // Выбирает подходящий ближайший момент начала ограбления
 module.exports.getAppropriateMoment = function (json, minDuration, workingHours) {
+    if (Object.keys(json).length === 0) {
+        return null;
+    }
     var appropriateMoment = moment();
 
     // 1. Читаем json
@@ -162,9 +163,9 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
         2: {},
         3: {}
     };
-    var offset = sliceAndParse(workingHours.from, 5);
+    var offset = cutTheTime(workingHours.from, 5);
     appropriateMoment.timezone = offset;
-    var workingHoursUTC = convertToUTC(workingHours, offset);
+    var workingHoursUTC = convertToUTC(workingHours, offset, false);
     for (var i = 1; i < 4; i++) {
         var anyDate = new Date();
         setHHMM(anyDate, workingHoursUTC.from);

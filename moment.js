@@ -19,12 +19,12 @@ module.exports = function () {
         // - %HH - часы
         // - %MM - минуты
         format: function (pattern) {
-            var theDate = new Date(this.date.getTime());
-            theDate.setHours(theDate.getHours() + this.timezone);
-            var week = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
-            var day = week[theDate.getDay()];
-            var hours = theDate.getHours();
-            var minutes = theDate.getMinutes();
+            var currentTime = new Date(this.date.getTime());
+            currentTime.setHours(currentTime.getHours() + this.timezone);
+            var dayOfTheWeek = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+            var day = dayOfTheWeek[currentTime.getDay()];
+            var hours = currentTime.getHours();
+            var minutes = currentTime.getMinutes();
             if (minutes === 0) {
                 minutes = '00';
             }
@@ -44,17 +44,6 @@ module.exports = function () {
         // Возвращает кол-во времени между текущей датой и переданной `moment`
         // в человекопонятном виде
         fromMoment: function (moment) {
-            var difference = Date.now() - moment;
-            if (difference >= 86400000) {
-                return (difference / 86400000) + ' суток';
-            } else if (difference >= 3600000) {
-                return (difference / 3600000) + ' часов';
-            } else if (difference >= 60000) {
-                return (difference / 60000) + ' минут';
-            } else if (difference >= 1000) {
-                return (difference / 1000) + ' секунд';
-            }
-            return difference + ' милисекунд';
         }
     };
 };
