@@ -20,7 +20,7 @@ module.exports = function () {
         // - %MM - минуты
         format: function (pattern) {
             if (this.date === null) {
-                return "Ограбления не будет!";
+                return 'Ограбления не будет!';
             }
             var currentTime = new Date(this.date.getTime());
             currentTime.setHours(currentTime.getHours() + this.timezone);
