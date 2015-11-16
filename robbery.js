@@ -49,9 +49,11 @@ function fillSchedule(schedule) {
         result[i] = [];
     }
     for (var i in schedule) {
-        var offset = cutTheTime(schedule[i][0]['from'], 8);
-        for (var j in schedule[i]) {
-            result[i].push(convertToUTC(schedule[i][j], offset, true));
+        if (schedule[i].length) {
+            var offset = cutTheTime(schedule[i][0]['from'], 8);
+            for (var j in schedule[i]) {
+                result[i].push(convertToUTC(schedule[i][j], offset, true));
+            }
         }
     }
     return result;
@@ -148,14 +150,19 @@ function findAllCombinations(listOfIntervals) { // задача: вернуть 
 
 // Выбирает подходящий ближайший момент начала ограбления
 module.exports.getAppropriateMoment = function (json, minDuration, workingHours) {
-    if (Object.keys(json).length === 0) {
-        return null;
-    }
     var appropriateMoment = moment();
 
     // 1. Читаем json
     // 2. Находим подходящий ближайший момент начала ограбления
     // 3. И записываем в appropriateMoment
+    appropriateMoment.date = null;
+    var business = JSON.parse(json);
+    if (!(Object.keys(business).length)) {
+        return appropriateMoment;
+    }
+    //if (areEmpty) {
+    //    return appropriateMoment;
+    //}
 
     // ВСЁ В UTC
     var bankSchedule = {
@@ -171,10 +178,10 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
         setHHMM(anyDate, workingHoursUTC.from);
         bankSchedule[i].from = [anyDate.getHours(), anyDate.getMinutes(), i];
         setHHMM(anyDate, workingHoursUTC.to);
-        anyDate.setMinutes(anyDate.getMinutes() - minDuration);
+        anyDate.setMinutes(anyDate.getMinutes()); // - minDuration
         bankSchedule[i].to = [anyDate.getHours(), anyDate.getMinutes(), i];
     }
-    var freeTime = invertIntervals(fillSchedule(JSON.parse(json)));
+    var freeTime = invertIntervals(fillSchedule(business));
     for (var i in bankSchedule) {
         var thatDayIntervals = {bank: [bankSchedule[i]]};
 
@@ -201,8 +208,8 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
         }
         //console.log(thatDayIntervals);
         var intervals = findAllCombinations(thatDayIntervals); // элемент - комбинация,
-        // пробежаться по
-        // ней, поискать пересечение. нашли - присвоили, домотали до нужного дня недели
+        // пробежаться по ней, поискать пересечение. нашли - присвоили, домотали до нужного дня
+        // недели
         //for (var j in intervals) {
         //    console.log(intervals[j], '#');
         //}
@@ -222,10 +229,10 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
             var theBeginning = thatDayDates[0].from;
             var theEnd = thatDayDates[0].to;
             for (var k in thatDayDates) { // самое позднее начало, самое раннее окончание
-                if (thatDayDates[k].from > theBeginning) {
+                if (thatDayDates[k].from >= theBeginning) {
                     theBeginning = thatDayDates[k].from;
                 }
-                if (thatDayDates[k].to < theEnd) {
+                if (thatDayDates[k].to <= theEnd) {
                     theEnd = thatDayDates[k].to;
                 }
             }
@@ -238,7 +245,7 @@ module.exports.getAppropriateMoment = function (json, minDuration, workingHours)
         }
         //console.log('-------');
     }
-    return null;
+    return appropriateMoment;
 };
 
 // Возвращает статус ограбления (этот метод уже готов!)
